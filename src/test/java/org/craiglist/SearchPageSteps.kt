@@ -1,126 +1,86 @@
-package org.craiglist;
+package org.craiglist
 
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-import com.google.common.base.CharMatcher;
-import com.google.inject.Inject;
-import cucumber.api.java.en.When;
-import cucumber.runtime.java.guice.ScenarioScoped;
-import org.craiglist.page.objects.SearchPage;
+import com.codeborne.selenide.Condition.visible
+import cucumber.api.java.en.When
+import org.craiglist.page.objects.SearchPage
 
-import java.util.ArrayList;
+class SearchPageSteps {
 
-import static com.codeborne.selenide.Condition.visible;
-
-@ScenarioScoped
-public class SearchPageSteps {
-
-    @Inject
-    public SearchPage searchPage;
-
+    var searchPage = SearchPage()
 
     @When("^I sort items by (lowest price|highest price|newest|relevant)$")
-    public void sortBy(String type) {
-        String selector = getSelectorForSortingOption(type);
+    fun sortBy(type: String) {
+        val selector = getSelectorForSortingOption(type)
 
-        searchPage.sortingSelector().click();
-        searchPage.sortingSelector().find(selector).click();
+        searchPage.sortingSelector().click()
+        searchPage.sortingSelector().find(selector) .click()
     }
 
     @When("^I see that (lowest price|highest price|newest|relevant|upcoming) sorting option is available$")
-    public void sortingOptionAvailable(String type) {
-        String selector = getSelectorForSortingOption(type);
+    fun sortingOptionAvailable(type: String) {
+        val selector = getSelectorForSortingOption(type)
 
-        searchPage.sortingSelector().find(selector).shouldBe(visible);
+        searchPage.sortingSelector().find(selector).shouldBe(visible)
     }
 
     @When("I open sorting selector")
-    public void openSortingSelector() {
-        searchPage.sortingSelector().click();
+    fun openSortingSelector() {
+        searchPage.sortingSelector().click()
     }
 
     @When("I apply search")
-    public void applySearch() {
-        searchPage.searchInput().shouldBe(visible).sendKeys("helsinki");
-        searchPage.searchButton().click();
+    fun applySearch() {
+        searchPage.searchInput().shouldBe(visible).sendKeys("helsinki")
+        searchPage.searchButton().click()
     }
 
     @When("^I see that items are sorted by (lowest price|highest price)$")
-    public void assertSortedBy(String type) {
-        ElementsCollection items = searchPage.items();
-        ArrayList<Integer> prices = collectPrices(items);
+    fun assertSortedBy(type: String) {
+        val prices = collectPrices()
 
-        try{
-            switch (type) {
-                case "lowest price":
-                    assertArraySortedByType(prices, Sorting.ASC);
-                    break;
-                case "highest price":
-                    assertArraySortedByType(prices, Sorting.DESC);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Wrong sorting type provided");
-            }
-        } catch (RuntimeException e) {
-            throw new AssertionError("The grid is not sorted by " + type);
+        when (type) {
+            "lowest price" -> assertArraySortedByAsc(prices, type)
+            "highest price" -> assertArraySortedByDesc(prices, type)
+            else -> throw IllegalArgumentException("Wrong sorting type provided")
         }
     }
 
-    private String getSelectorForSortingOption(String type) {
-        String selector;
+    private fun getSelectorForSortingOption(type: String): String {
 
-        switch (type) {
-            case "lowest price":
-                selector = "[data-selection='priceasc']";
-                break;
-            case "highest price":
-                selector = "[data-selection='pricedsc']";
-                break;
-            case "newest":
-                selector = "[data-selection='date']";
-                break;
-            case "relevant":
-                selector = "[data-selection='rel']";
-                break;
-            case "upcoming":
-                selector = "[data-selection='upcoming']";
-                break;
-            default:
-                throw new IllegalArgumentException("Wrong sorting type provided");
-        }
-
-        return selector;
-    }
-
-    private void assertArraySortedByType(ArrayList<Integer> array, Sorting type) {
-        for (int i = 0; i < array.size() - 1; i++) {
-            boolean check;
-            if(type.equals(Sorting.ASC)) {
-                check = array.get(i) > array.get(i + 1);
-            } else {
-                check = array.get(i) < array.get(i + 1);
-            }
-            if(check) {
-                throw new RuntimeException("Array is not sorted");
-            }
+        return when (type) {
+            "lowest price" -> "[data-selection='priceasc']"
+            "highest price" ->  "[data-selection='pricedsc']"
+            "newest" ->  "[data-selection='date']"
+            "relevant" ->  "[data-selection='rel']"
+            "upcoming" ->  "[data-selection='upcoming']"
+            else -> throw IllegalArgumentException("Wrong sorting type provided")
         }
     }
 
-    private ArrayList<Integer> collectPrices(ElementsCollection items) {
-        ArrayList<Integer> prices = new ArrayList<>();
+    private fun assertArraySortedByAsc(array: List<Int>, type: String) {
+        val isSorted = array.zipWithNext().all { it.first <= it.second }
 
-        for (SelenideElement item : items) {
-            String stringPrice = item.find(".result-price").text();
-            String trimmedPrice = CharMatcher.is('€').trimFrom(stringPrice);
-
-            prices.add(Integer.parseInt(trimmedPrice));
+        if(!isSorted) {
+            throw AssertionError("The grid is not sorted by $type")
         }
+    }
+    private fun assertArraySortedByDesc(array: List<Int>, type: String) {
+        val isSorted = array.zipWithNext().all { it.first >= it.second }
 
-        return prices;
+        if(!isSorted) {
+            throw AssertionError("The grid is not sorted by $type")
+        }
     }
 
-    enum Sorting {
-        ASC,
-        DESC
+    private fun collectPrices(): MutableList<Int> {
+        val items = searchPage.items()
+        val prices = mutableListOf<Int>()
+
+        for (item in items) {
+            val price = item.find(".result-price").text().removePrefix("€").toInt()
+            prices.add(price)
+        }
+
+        return prices
     }
 }

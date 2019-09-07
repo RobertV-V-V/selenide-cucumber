@@ -1,27 +1,24 @@
-package org.craiglist;
+package org.craiglist
 
-import com.codeborne.selenide.Screenshots;
-import com.google.common.io.Files;
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import io.qameta.allure.Allure;
+import com.codeborne.selenide.Screenshots
+import com.google.common.io.Files.toByteArray
+import cucumber.api.Scenario
+import cucumber.api.java.After
+import io.qameta.allure.Allure
+import java.io.ByteArrayInputStream
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-
-public class Hook {
+class Hook {
     @After
-    public void addScreenshot(Scenario scenario) {
-        if (scenario.isFailed()) {
+    fun addScreenshot(scenario: Scenario) {
+        if (scenario.isFailed) {
             try {
-                File file = Screenshots.takeScreenShotAsFile();
-                byte[] screenshot = Files.toByteArray(file);
-                InputStream is = new ByteArrayInputStream(screenshot);
-                Allure.addAttachment("failed step", is);
-            } catch (Exception e) {
-                e.printStackTrace();
+                val file = Screenshots.takeScreenShotAsFile()
+                val screenshot = ByteArrayInputStream(toByteArray(file))
+                Allure.addAttachment("failed step", screenshot)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+
         }
     }
 }

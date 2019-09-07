@@ -1,26 +1,15 @@
-package org.craiglist.page.objects;
+package org.craiglist.page.objects
 
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.Condition
+import com.codeborne.selenide.Selenide.element
+import com.codeborne.selenide.Selenide.elements
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+class SearchPage {
+    fun sortingSelector() = element(".dropdown-sort")
 
-public class SearchPage {
-    public SelenideElement sortingSelector() {
-        return $(".dropdown-sort");
-    }
+    fun items() = elements(".result-row").filterBy(Condition.text("€"))
 
-    public ElementsCollection items() {
-        return $$(".result-row").filterBy(Condition.text("€"));
-    }
+    fun searchInput() = element("#query")
 
-    public SelenideElement searchInput() {
-        return $("#query");
-    }
-
-    public SelenideElement searchButton() {
-        return $(".searchbtn");
-    }
+    fun searchButton() = element(".searchbtn")
 }

@@ -1,15 +1,9 @@
-package org.craiglist.page.objects;
+package org.craiglist.page.objects
 
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.Selenide.element
 
-import static com.codeborne.selenide.Selenide.$;
+class HomePage {
+    fun languageSelector() = element("#chlang")
 
-public class HomePage {
-    public SelenideElement languageSelector() {
-        return $("#chlang");
-    }
-
-    public SelenideElement category(String categoryName) {
-        return $("[data-alltitle = '" + categoryName + "']");
-    }
+    fun category(categoryName: String) = element("[data-alltitle = '$categoryName']")
 }

@@ -1,22 +1,19 @@
-package org.craiglist;
+package org.craiglist
 
-import com.google.inject.Inject;
-import cucumber.api.java.en.And;
-import org.craiglist.page.objects.HomePage;
+import com.codeborne.selenide.Condition.visible
+import cucumber.api.java.en.And
+import org.craiglist.page.objects.HomePage
 
-import static com.codeborne.selenide.Condition.visible;
-
-public class HomePageSteps {
-
-    @Inject
-    public HomePage homePage;
+class HomePageSteps {
+    var homePage = HomePage()
 
     @And("^I set (english|français|español) language$")
-    public void setLanguage(String language) {
-        homePage.languageSelector().shouldBe(visible).selectOptionContainingText(language);
+    fun setLanguage(language: String) {
+        homePage.languageSelector().shouldBe(visible).selectOptionContainingText(language)
     }
+
     @And("I open {string} category")
-    public void openCategory(String categoryName) {
-        homePage.category(categoryName).click();
+    fun openCategory(categoryName: String) {
+        homePage.category(categoryName).click()
     }
 }
