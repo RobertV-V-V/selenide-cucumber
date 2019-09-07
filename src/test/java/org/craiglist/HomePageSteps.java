@@ -11,11 +11,11 @@ public class HomePageSteps {
     @Inject
     public HomePage homePage;
 
-    @And("I set (english|français|español) language")
+    @And("^I set (english|français|español) language$")
     public void setLanguage(String language) {
         homePage.languageSelector().shouldBe(visible).selectOptionContainingText(language);
     }
-    @And("I open \"(.+)\" category")
+    @And("I open {string} category")
     public void openCategory(String categoryName) {
         homePage.category(categoryName).click();
     }

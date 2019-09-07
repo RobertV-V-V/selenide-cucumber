@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.craiglist.page.objects.SearchPage;
-import org.junit.AssumptionViolatedException;
 
 import java.util.ArrayList;
 
@@ -20,7 +19,7 @@ public class SearchPageSteps {
     public SearchPage searchPage;
 
 
-    @When("I sort items by (lowest price|highest price|newest|relevant)")
+    @When("^I sort items by (lowest price|highest price|newest|relevant)$")
     public void sortBy(String type) {
         String selector = getSelectorForSortingOption(type);
 
@@ -28,7 +27,7 @@ public class SearchPageSteps {
         searchPage.sortingSelector().find(selector).click();
     }
 
-    @When("I see that (lowest price|highest price|newest|relevant|upcoming) sorting option is available")
+    @When("^I see that (lowest price|highest price|newest|relevant|upcoming) sorting option is available$")
     public void sortingOptionAvailable(String type) {
         String selector = getSelectorForSortingOption(type);
 
@@ -46,7 +45,7 @@ public class SearchPageSteps {
         searchPage.searchButton().click();
     }
 
-    @When("I see that items are sorted by (lowest price|highest price)")
+    @When("^I see that items are sorted by (lowest price|highest price)$")
     public void assertSortedBy(String type) {
         ElementsCollection items = searchPage.items();
         ArrayList<Integer> prices = collectPrices(items);
@@ -54,16 +53,16 @@ public class SearchPageSteps {
         try{
             switch (type) {
                 case "lowest price":
-                    isArraySortedByType(prices, Sorting.ASC);
+                    assertArraySortedByType(prices, Sorting.ASC);
                     break;
                 case "highest price":
-                    isArraySortedByType(prices, Sorting.DESC);
+                    assertArraySortedByType(prices, Sorting.DESC);
                     break;
                 default:
                     throw new IllegalArgumentException("Wrong sorting type provided");
             }
         } catch (RuntimeException e) {
-            throw new AssumptionViolatedException("The grid is not sorted by " + type);
+            throw new AssertionError("The grid is not sorted by " + type);
         }
     }
 
@@ -93,7 +92,7 @@ public class SearchPageSteps {
         return selector;
     }
 
-    private void isArraySortedByType(ArrayList<Integer> array, Sorting type) {
+    private void assertArraySortedByType(ArrayList<Integer> array, Sorting type) {
         for (int i = 0; i < array.size() - 1; i++) {
             boolean check;
             if(type.equals(Sorting.ASC)) {
