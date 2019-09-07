@@ -1,0 +1,19 @@
+version: "3.5"
+
+networks:
+  default:
+    external:
+      name: docker_default
+
+services:
+  tests:
+    shm_size: 4gb
+    build:
+      context: ./
+    image: cucumber/tests
+    command: tail -f /dev/null
+    container_name: cucumber_tests
+    volumes:
+      - ./target/:/target/
+      - ./src/:/src/
+      - ./pom.xml:/pom.xml
