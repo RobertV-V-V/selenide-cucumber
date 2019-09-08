@@ -11,14 +11,9 @@ class Hook {
     @After
     fun addScreenshot(scenario: Scenario) {
         if (scenario.isFailed) {
-            try {
-                val file = Screenshots.takeScreenShotAsFile()
-                val screenshot = ByteArrayInputStream(toByteArray(file))
-                Allure.addAttachment("failed step", screenshot)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
+            val file = Screenshots.takeScreenShotAsFile()
+            val screenshot = ByteArrayInputStream(toByteArray(file))
+            Allure.addAttachment("failed step", screenshot)
         }
     }
 }
